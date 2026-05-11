@@ -23,26 +23,16 @@ jobs:
       - name: Run Maven Tests
         run: mvn test
 
-      - name: Check Mail Secrets
+      - name: Upload TestNG Report
         if: always()
-        env:
-          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-        run: |
-          if [ -z "$MAIL_USERNAME" ]; then
-            echo "MAIL_USERNAME secret is missing"
-            exit 1
-          fi
-
-          if [ -z "$MAIL_PASSWORD" ]; then
-            echo "MAIL_PASSWORD secret is missing"
-            exit 1
-          fi
-
-          echo "Mail secrets are available"
+        uses: actions/upload-artifact@v4
+        with:
+          name: testng-report
+          path: target/surefire-reports/
 
       - name: Send HTML Report Mail
         if: always()
+        continue-on-error: true
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
