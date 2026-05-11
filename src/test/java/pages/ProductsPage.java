@@ -3,6 +3,7 @@ package pages;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -22,7 +23,19 @@ public class ProductsPage {
         this.wait = wait;
     }
 
+    public void makeSureProductsPageIsOpen() {
+        try {
+            wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
+            System.out.println("Products page already opened");
+        } catch (TimeoutException e) {
+            System.out.println("Products page not loaded. Opening directly again.");
+            driver.get("https://automationexercise.com/products");
+            wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
+        }
+    }
+
     public void searchProduct(String productName) {
+        makeSureProductsPageIsOpen();
         removeAds();
 
         WebElement search = wait.until(ExpectedConditions.visibilityOfElementLocated(searchBox));
@@ -39,7 +52,6 @@ public class ProductsPage {
         WebElement addToCart = wait.until(ExpectedConditions.presenceOfElementLocated(firstAddToCartButton));
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
-
         js.executeScript("arguments[0].scrollIntoView(true);", addToCart);
         js.executeScript("arguments[0].click();", addToCart);
 

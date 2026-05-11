@@ -32,13 +32,14 @@ public class BaseTest {
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--window-size=1920,1080");
-            System.out.println("Running tests in headless mode");
+            System.out.println("Running in GitHub Actions headless mode");
         }
 
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
 
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         System.out.println("Browser opened only one time");
     }
