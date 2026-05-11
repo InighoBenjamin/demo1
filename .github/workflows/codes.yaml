@@ -10,29 +10,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Project
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
+          cache: maven
 
-      - run: mvn test
+      - name: Run Maven Tests
+        run: mvn test
+
+      - name: Check Mail Secrets
+        if: always()
+        env:
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+        run: |
+          if [ -z "$MAIL_USERNAME" ]; then
+            echo "MAIL_USERNAME secret is missing"
+            exit 1
+          fi
+
+          if [ -z "$MAIL_PASSWORD" ]; then
+            echo "MAIL_PASSWORD secret is missing"
+            exit 1
+          fi
+
+          echo "Mail secrets are available"
 
       - name: Send HTML Report Mail
+        if: always()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
 
-
           username: ${{ secrets.MAIL_USERNAME }}
           password: ${{ secrets.MAIL_PASSWORD }}
 
-          subject: Automation test Report
-
+          subject: Automation Test Report
           to: shaliniviswanathan42@gmail.com
-          from: Github Actions
+          from: ${{ secrets.MAIL_USERNAME }}
 
-          html_body: target/surefire-reports/emailable-report.html
+          html_body: file://target/surefire-reports/emailable-report.html
