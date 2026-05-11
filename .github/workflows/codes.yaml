@@ -35,4 +35,4 @@ jobs:
           to: shaliniviswanathan42@gmail.com
           from: Github Actions
 
-          html_body: file://target/surefire-reports/emailable-report.html
+          html_body: target/surefire-reports/emailable-report.html
